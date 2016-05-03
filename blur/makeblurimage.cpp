@@ -2,7 +2,6 @@
 
 
 MakeBlurImage::MakeBlurImage(QObject *parent) : QObject(parent)
-  ,inMake(false)
 {
 
 }
@@ -10,18 +9,17 @@ MakeBlurImage::MakeBlurImage(QObject *parent) : QObject(parent)
 void MakeBlurImage::setImage(const QString &filename)
 {
     mImage.load(filename);
-    emit makeOver(mImage);
+    //    emit makeOver(mImage);
 }
 
 void MakeBlurImage::makeBlur(int lever)
 {
-    if(inMake)
-        return;
-    inMake = true;
     QMutexLocker loker(&mMutex);
 
-    if(lever == 0)
+    if(lever == 0){
+        emit makeOver(mImage);
         return;
+    }
     int width = mImage.width();
     int height = mImage.height();
     for(int x = 0; x<width; x++){
@@ -34,17 +32,17 @@ void MakeBlurImage::makeBlur(int lever)
             int ps = 0;
             for(int i = -lever; i <= lever; i++){
                 for(int j = -lever; j <= lever; j++){
-                        if(i==0 && j==0){
-                            continue;
-                        }
-                        int xx = x+i;
-                        int yy = y+j;
-                        if(xx<0 || yy<0 || xx>=width || yy>=height) continue;
-                        QColor temp(mImage.pixel(xx,yy));
-                        red += temp.red();
-                        blue += temp.blue();
-                        green += temp.green();
-                        ps++;
+                    if(i==0 && j==0){
+                        continue;
+                    }
+                    int xx = x+i;
+                    int yy = y+j;
+                    if(xx<0 || yy<0 || xx>=width || yy>=height) continue;
+                    QColor temp(mImage.pixel(xx,yy));
+                    red += temp.red();
+                    blue += temp.blue();
+                    green += temp.green();
+                    ps++;
                 }
             }
             red/=ps;
@@ -55,5 +53,4 @@ void MakeBlurImage::makeBlur(int lever)
         }
     }
     emit makeOver(mImage);
-    inMake = false;
 }

@@ -17,7 +17,6 @@ signals:
 public slots:
     void makeBlur(int lever);
 private:
-    bool inMake;
     QImage mImage;
     QMutex mMutex;
 };
