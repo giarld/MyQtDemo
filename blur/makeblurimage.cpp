@@ -1,5 +1,5 @@
 #include "makeblurimage.h"
-
+#include <QThread>
 
 MakeBlurImage::MakeBlurImage(QObject *parent) : QObject(parent)
 {
@@ -56,9 +56,10 @@ void MakeBlurImage::makeBlur(int lever)
             mImage.setPixel(x,y,zz.rgb());
         }
         xp++;
-        if(xp > range){
+        if(xp >= range){
             emit getProcess(100, value++);
             xp = 0;
+            QThread::msleep(1);
         }
     }
     emit makeOver(mImage);

@@ -5,9 +5,10 @@
 #include <QThread>
 #include <makeblurimage.h>
 #include <QImage>
-#include <QSlider>
+#include <QPushButton>
 
 class QProgressBar;
+#define N 6
 
 class Widget : public QWidget
 {
@@ -20,17 +21,21 @@ public:
 protected:
     void paintEvent(QPaintEvent*);
 
+    void setButtonsDisable();
+    void setButtonsEnable();
 public slots:
     void Over(const QImage& img);
     void toMake(int lever);
     void updatePDialog(int range, int value);
+    void buttonOn();
 
 signals:
     void mitMake(int lever);
+    void sliderValueChanged(int v);
 
 private:
     int mBlurLever;
-    QSlider *mSlider;
+    QPushButton *mButtons[N];
     QImage mImage;
     QThread *mMThread;
     MakeBlurImage *mMake;
