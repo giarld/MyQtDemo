@@ -14,6 +14,7 @@ public:
     void setImage(const QString& filename);
 signals:
     void makeOver(const QImage& img);
+    void getProcess(int range, int value);
 public slots:
     void makeBlur(int lever);
 private:

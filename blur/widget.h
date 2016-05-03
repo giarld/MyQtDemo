@@ -7,6 +7,8 @@
 #include <QImage>
 #include <QSlider>
 
+class QProgressBar;
+
 class Widget : public QWidget
 {
     Q_OBJECT
@@ -21,6 +23,7 @@ protected:
 public slots:
     void Over(const QImage& img);
     void toMake(int lever);
+    void updatePDialog(int range, int value);
 
 signals:
     void mitMake(int lever);
@@ -31,6 +34,7 @@ private:
     QImage mImage;
     QThread *mMThread;
     MakeBlurImage *mMake;
+    QProgressBar *mProgress;
 };
 
 #endif // WIDGET_H

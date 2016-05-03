@@ -8,6 +8,7 @@ MakeBlurImage::MakeBlurImage(QObject *parent) : QObject(parent)
 
 void MakeBlurImage::setImage(const QString &filename)
 {
+    QMutexLocker loker(&mMutex);
     mImage.load(filename);
     //    emit makeOver(mImage);
 }
@@ -22,6 +23,9 @@ void MakeBlurImage::makeBlur(int lever)
     }
     int width = mImage.width();
     int height = mImage.height();
+    int range = width/100;
+    int xp = 0;
+    int value = 0;
     for(int x = 0; x<width; x++){
         for(int y = 0; y<height; y++){
             QRgb pixs = 0;
@@ -50,6 +54,11 @@ void MakeBlurImage::makeBlur(int lever)
             green/=ps;
             QColor zz(red,green,blue,pcolor.alpha());
             mImage.setPixel(x,y,zz.rgb());
+        }
+        xp++;
+        if(xp > range){
+            emit getProcess(100, value++);
+            xp = 0;
         }
     }
     emit makeOver(mImage);
