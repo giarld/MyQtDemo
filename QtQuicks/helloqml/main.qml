@@ -18,16 +18,23 @@ Window {
             id: helloText
             text: qsTr("Hello World")
             y: 30
+            property bool ttt: false
             anchors.horizontalCenter: page.horizontalCenter
             font.pointSize: 24
             font.bold: true
 
             MouseArea {
                 id: mouseArea; anchors.fill: parent
+                onClicked: {
+                    if(helloText.ttt == false)
+                        helloText.ttt = true;
+                    else
+                        helloText.ttt = false;
+                }
             }
 
             states: State {
-                name: "down"; when: mouseArea.pressed == true
+                name: "down"; when: helloText.ttt == true
                 PropertyChanges {
                     target: helloText
                     y: page.height-50; rotation: 360; color: "red"
@@ -41,12 +48,12 @@ Window {
                 ParallelAnimation {
                     NumberAnimation {
                         properties: "y,rotation"
-                        duration: 500
+                        duration: 1000
                         easing.type: Easing.InOutQuad
                     }
 
                     ColorAnimation {
-                        duration: 500
+                        duration: 1000
                     }
                 }
             }
