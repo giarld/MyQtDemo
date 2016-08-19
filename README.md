@@ -1,3 +1,3 @@
 Gxin's Qt Demos
 ===============
-qt
+qt demos
