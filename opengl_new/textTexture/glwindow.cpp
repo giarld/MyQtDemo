@@ -144,12 +144,12 @@ void GLWindow::initShaderProgram()
     mShaderProgram->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource);
     mShaderProgram->link();
 
-    mShaderProgram->bind();
+//    mShaderProgram->bind();
     mPosAttr = mShaderProgram->attributeLocation("posAttr");
     mTexAttr = mShaderProgram->attributeLocation("texcoord");
     mMatrixLoc = mShaderProgram->uniformLocation("matrix");
     mProjLoc = mShaderProgram->uniformLocation("projMatrix");
-    mShaderProgram->release();
+//    mShaderProgram->release();
 }
 
 void GLWindow::initUi()
