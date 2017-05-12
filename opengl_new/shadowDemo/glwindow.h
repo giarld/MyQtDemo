@@ -4,9 +4,12 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
-#include <QOpenGLBuffer>
 #include <QMatrix4x4>
 #include <QOpenGLTexture>
+#include <QVector3D>
+
+class PreviewWidget;
+class Box;
 
 class GLWindow : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -21,9 +24,24 @@ protected:
     void initializeGL() Q_DECL_OVERRIDE;
     void resizeGL(int w, int h) Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
+    void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
+
+private:
+    void initShaderProgram();
 
 private:
     QMatrix4x4 mProjMatrix;
+    QOpenGLShaderProgram *mShadowShader;
+    QOpenGLShaderProgram *mRenderShader;
+    Box *mBox;
+
+    GLuint mPosAttr;
+    GLuint mColAttr;
+    GLuint mNormalAttr;
+    GLuint mMatrixLoc;
+    GLuint mProjLoc;
+
+    PreviewWidget *mPreviewWidget;
 };
 
 #endif // GLWINDOW_H

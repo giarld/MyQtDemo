@@ -24,6 +24,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        glwindow.cpp
+        glwindow.cpp \
+    previewwidget.cpp \
+    box.cpp
 
-HEADERS  += glwindow.h
+HEADERS  += glwindow.h \
+    previewwidget.h \
+    box.h
+
+RESOURCES += \
+    res.qrc

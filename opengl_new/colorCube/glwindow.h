@@ -7,6 +7,7 @@
 #include <QOpenGLBuffer>
 #include <QMatrix4x4>
 #include <QVector>
+#include <QOpenGLVertexArrayObject>
 
 class GLWindow : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -26,6 +27,7 @@ private:
     void initShaderProgram();
 
 private:
+    QOpenGLVertexArrayObject mVAO;
     QOpenGLShaderProgram *mShaderProgram;
     QMatrix4x4 mProjMatrix;
 
