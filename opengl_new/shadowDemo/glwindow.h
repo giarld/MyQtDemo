@@ -7,6 +7,7 @@
 #include <QMatrix4x4>
 #include <QOpenGLTexture>
 #include <QVector3D>
+#include <QOpenGLVertexArrayObject>
 
 class PreviewWidget;
 class Box;
@@ -30,6 +31,8 @@ private:
     void initShaderProgram();
 
 private:
+    QOpenGLVertexArrayObject mVAO;
+
     QMatrix4x4 mProjMatrix;
     QOpenGLShaderProgram *mShadowShader;
     QOpenGLShaderProgram *mRenderShader;

@@ -1,6 +1,5 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    liblua \
-    libtolua \
+    lua \
     qtlua

@@ -6,7 +6,7 @@
 
 QT       -= core gui
 
-TARGET = liblua
+TARGET = lua
 TEMPLATE = lib
 CONFIG += staticlib
 

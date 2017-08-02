@@ -1,47 +1,47 @@
-print("Hello World")
-
-main = function()
-  local w = Widget:new()
-  w:setWindowTitle("你好世界")
-  w:show()
-end
-
-main()
-
-local Sub = {
-  value = 0,
-  index = 0
+Class = {
+    name = "",
+    id = 0,
+    sum = 0
 }
 
-function Sub:new(o)
-  o = o or {}
-  setmetatable(o, self)
-  self.__index = self
-  return o;
+function Class:new(o)
+    o = o or {}
+    setmetatable(o, self)
+    self.__index = self
+    return o
 end
 
-function Sub:show()
-  print(">>>>>>>>>>>>>>>>>>>>>>>>>")
-  for key, value in pairs(self) do
-    print(key.." "..value)
-  end
-  print("<<<<<<<<<<<<<<<<<<<<<<<<<")
+function Class:__tostring()
+    return "name = "..self.name..", id = "..self.id
 end
 
-a = Sub:new {}
-a.value = 4
-a:show()
-
-print("===================")
-
-local PSub = Sub:new {ps = 0}
-
-function PSub:dis()
-  print("ps = "..self.ps)
+function Class:__add(b)
+    self.sum = self.sum + b.sum
+    return self
 end
 
-b = PSub:new()
-b:dis()
-b:show()
+obj = Class:new()
+obj.name = "hh"
+obj.id = 12
+obj.sum = 1
 
-print("end")
+print(obj)
+
+function test(i)
+    local ctest = CTest.new()
+    ctest:setName("CTest赞")
+    ctest:setId(i)
+    print(ctest:getName().." "..ctest:getId())
+end
+
+
+for i=1,10 do
+    test(i)
+end
+--collectgarbage()
+
+local test = CTest:new()
+test:setId(777)
+test:setNameAsyn("你好", function(name)
+    print("asyn = "..name)
+end)

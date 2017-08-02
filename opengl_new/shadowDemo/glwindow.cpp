@@ -3,7 +3,6 @@
 #include "box.h"
 #include <QDebug>
 #include <QOpenGLFramebufferObject>
-#include <QOpenGLVertexArrayObject>
 
 GLWindow::GLWindow(QWidget *parent)
     : QOpenGLWidget(parent)
@@ -25,6 +24,9 @@ void GLWindow::initializeGL()
 
     QOpenGLFunctions *gl = QOpenGLContext::currentContext()->functions();
     gl->glClearColor(0, 0, 0, 1.0f);
+
+    mVAO.create();
+    mVAO.bind();
 
     mBox = new Box(this);
     initShaderProgram();
@@ -53,10 +55,6 @@ void GLWindow::paintGL()
     matrix.rotate(0, 0, 0, 1);
     mRenderShader->setUniformValue(mMatrixLoc, matrix);
     mRenderShader->setUniformValue(mProjLoc, mProjMatrix);
-
-    QOpenGLVertexArrayObject vao;
-    vao.create();
-    QOpenGLVertexArrayObject::Binder binder(&vao);
 
     mBox->bind();
 
