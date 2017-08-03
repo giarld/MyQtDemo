@@ -37,7 +37,7 @@ Window {
                 name: "down"; when: helloText.ttt == true
                 PropertyChanges {
                     target: helloText
-                    y: page.height-50; rotation: 360; color: "red"
+                    y: page.height-50; rotation: 180; color: "red"
                 }
             }
 
