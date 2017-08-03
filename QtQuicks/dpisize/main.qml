@@ -21,7 +21,7 @@ Window {
 
         Text {
             text: "Hello"
-            font.pointSize: DPI.dpi(appWin, 100)
+            font.pixelSize: DPI.dpi(appWin, 100)
             anchors.centerIn: parent
             color: "#ff0000"
             style: Text.Outline
