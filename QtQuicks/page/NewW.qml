@@ -7,11 +7,25 @@ Window {
     height: 240
     title: qsTr("New Window")
 
+    Image {
+        id: img
+        anchors.fill: parent
+        source: "http://giarld.github.io/img/avatar.png"
+    }
+
     Button {
         text: "close"
         anchors.centerIn: parent
         onClicked: {
-            close();
+            close()
         }
+    }
+
+    Component.onCompleted: {
+        console.log("NewW Create")
+    }
+
+    Component.onDestruction: {
+        console.log("NewW Destroy")
     }
 }
