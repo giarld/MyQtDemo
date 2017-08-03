@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
+        <file>NewW.qml</file>
         <file>apage.qml</file>
     </qresource>
 </RCC>

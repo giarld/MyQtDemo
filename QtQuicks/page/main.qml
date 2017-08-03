@@ -57,6 +57,28 @@ Window {
                 }
             }
         }
+
+        Rectangle {
+            width: 100
+            height: 50
+            color: "#ff0000"
+
+            Text {
+                text: qsTr("新窗口")
+                anchors.centerIn: parent
+            }
+
+            NewW {
+                id: newW
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    newW.show();
+                }
+            }
+        }
     }
 
     function destroyExam() {
