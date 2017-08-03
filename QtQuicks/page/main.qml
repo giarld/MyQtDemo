@@ -13,8 +13,8 @@ Window {
         spacing: 30
         anchors.centerIn: parent
         Rectangle {
-            width: 100
-            height: 50
+            width: appWin.width * 0.2
+            height: width * 0.5
             color: "#00ff00"
 
             Text {
@@ -35,8 +35,8 @@ Window {
         }
 
         Rectangle {
-            width: 100
-            height: 50
+            width: appWin.width * 0.2
+            height: width * 0.5
             color: "#0000ff"
 
             Text {
@@ -59,8 +59,8 @@ Window {
         }
 
         Rectangle {
-            width: 100
-            height: 50
+            width: appWin.width * 0.2
+            height: width * 0.5
             color: "#ff0000"
 
             Text {
