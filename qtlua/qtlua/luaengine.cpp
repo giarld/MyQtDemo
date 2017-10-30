@@ -25,6 +25,12 @@ void LuaEngine::closeState()
     lua_close(L_State);
 }
 
+void LuaEngine::dofile(const char *filePath)
+{
+    luaL_dofile(L_State, filePath);
+    lua_gc(L_State, LUA_GCCOLLECT, 0);
+}
+
 void LuaEngine::init()
 {
     L_State = luaL_newstate();

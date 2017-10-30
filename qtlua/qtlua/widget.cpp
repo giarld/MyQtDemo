@@ -6,11 +6,11 @@
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
 {
+    LuaBClass::Register();
     LuaCTest::Register();
-    lua_State *L = LuaEngine::getInstance()->getLuaState();
+    LuaEngine *le = LuaEngine::getInstance();
 
-    luaL_dofile(L, "/Users/gxin/codes/gxin/MyQtDemo/qtlua/test.lua");
-    lua_gc(L, LUA_GCCOLLECT, 0);
+    le->dofile("test.lua");
 
     exit(0);
 }

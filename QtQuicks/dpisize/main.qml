@@ -1,6 +1,7 @@
 import QtQuick 2.6
 import QtQuick.Window 2.2
 import "dpi.js" as DPI
+import QtQuick.Particles 2.0
 
 Window {
     id: appWin

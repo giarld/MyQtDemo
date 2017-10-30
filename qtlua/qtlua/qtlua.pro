@@ -15,11 +15,15 @@ TEMPLATE = app
 SOURCES += main.cpp\
         widget.cpp \
     luaengine.cpp \
-    ctest.cpp
+    ctest.cpp \
+    aclass.cpp \
+    bclass.cpp
 
 HEADERS  += widget.h \
     luaengine.h \
-    ctest.h
+    ctest.h \
+    aclass.h \
+    bclass.h
 
 # liblua
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lua/release/ -llua

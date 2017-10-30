@@ -34,14 +34,29 @@ function test(i)
     print(ctest:getName().." "..ctest:getId())
 end
 
-
-for i=1,10 do
-    test(i)
-end
+-- for i=1,10 do
+--     test(i)
+-- end
 --collectgarbage()
 
 local test = CTest:new()
 test:setId(777)
-test:setNameAsyn("你好", function(name)
-    print("asyn = "..name)
-end)
+test:setName("meme")
+print("subobj test")
+test:getA():setA(111)
+print("test:getA():getA() = "..test:getA():getA())
+print(test:getName())
+
+local test2 = CTest:new("test2")
+print("test2 "..test2:getId().." "..test2:getName());
+
+local test3 = CTest.new("test3")
+print("test3 "..test3:getId().." "..test3:getName());
+
+local bct = BClass.new()
+bct:setB(777)
+print("bct id = "..bct:getB())
+test3:setB(bct)
+print("test.B.getB = "..test3:getB():getB())
+
+print("end")

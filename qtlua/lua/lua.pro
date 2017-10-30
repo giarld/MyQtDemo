@@ -41,7 +41,6 @@ SOURCES += \
     ltablib.c \
     ltm.c \
     lua.c \
-    luac.c \
     lundump.c \
     lutf8lib.c \
     lvm.c \

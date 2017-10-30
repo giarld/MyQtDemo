@@ -3,6 +3,8 @@
 
 #include <lua.hpp>
 #include <QObject>
+#include "aclass.h"
+#include "bclass.h"
 
 class CTest
 {
@@ -16,9 +18,17 @@ public:
     int getId() const;
     void setId(int value);
 
+    AClass *getA() const;
+    void setA(AClass *value);
+
+    BClass *getB() const;
+    void setB(BClass *value);
+
 private:
     QString name;
     int id;
+    AClass *a;
+    BClass *b;
 };
 
 class LuaCTest
@@ -39,6 +49,12 @@ private:
     static int setId(lua_State *L);
 
     static int setNameAsyn(lua_State *L);
+
+    //对象变量导出示例
+    static int getA(lua_State *L);
+
+    static int setB(lua_State *L);
+    static int getB(lua_State *L);
 
     static CTest *getObj(lua_State *L);
 private:

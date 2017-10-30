@@ -11,6 +11,7 @@ public:
 public:
     lua_State *getLuaState();
     void closeState();
+    void dofile(const char* filePath);
 
 private:
     void init();
