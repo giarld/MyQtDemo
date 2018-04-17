@@ -2,7 +2,5 @@
     <qresource prefix="/">
         <file>shaders/scene.frag</file>
         <file>shaders/scene.vert</file>
-        <file>shaders/abs.frag</file>
-        <file>shaders/abs.vert</file>
     </qresource>
 </RCC>

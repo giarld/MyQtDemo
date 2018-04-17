@@ -10,7 +10,7 @@ Widget::Widget(QWidget *parent)
     LuaCTest::Register();
     LuaEngine *le = LuaEngine::getInstance();
 
-    le->dofile("test.lua");
+    le->dofile("/Users/gxin/codes/gxin/MyQtDemo/qtlua/test.lua");
 
     exit(0);
 }

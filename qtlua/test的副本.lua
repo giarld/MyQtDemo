@@ -60,24 +60,10 @@ end
 -- print("test.B.getB = "..test3:getB():getB())
 
 co = coroutine.create( function(a, b, c)
-    while(true) do
-        for i = 1, 10000000 do
-            -- pass
-        end
-        local aa, bb, cc = coroutine.yield(a, b, c)
-        print('co', aa, bb, cc)
-        -- print('co', coroutine.yield(a, b, c));
-    end
+    print('co', a, b, c)
 end )
 
-print("0")
-coroutine.resume(co)
-print("1")
-coroutine.resume(co, 1, 2, 3)
-print("2")
-coroutine.resume(co, 4, 5, 6)
-print("3")
-coroutine.resume(co, 7, 8, 9)
-print("4")
+coroutine.resume(co, 1, 2, 3);
+coroutine.resume(co, 4, 5, 6);
 
 print("end")

@@ -84,59 +84,27 @@ void Box::build()
     int boxVertexCount = 36;
 
     Vertex floorVertexs[] = {
-        {QVector3D(-20, -1 , -20), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
-        {QVector3D(-20, -1 , 20), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
-        {QVector3D(20, -1 , -20), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
+        {QVector3D(-2, -1 , -2), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
+        {QVector3D(-2, -1 , 2), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
+        {QVector3D(2, -1 , -2), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
 
-        {QVector3D(20, -1 , -20), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
-        {QVector3D(-20, -1 , 20), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
-        {QVector3D(20, -1 , 20), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
+        {QVector3D(2, -1 , -2), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
+        {QVector3D(-2, -1 , 2), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
+        {QVector3D(2, -1 , 2), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
 
-        {QVector3D(-2, 0 , 2), QVector3D(1, 1, 1), QVector3D(1, 0, 0)},
+        {QVector3D(-2, 2 , 2), QVector3D(1, 1, 1), QVector3D(1, 0, 0)},
         {QVector3D(-2, -1 , 2), QVector3D(1, 1, 1), QVector3D(1, 0, 0)},
-        {QVector3D(-2, 0 , -2), QVector3D(1, 1, 1), QVector3D(1, 0, 0)},
+        {QVector3D(-2, 2 , -2), QVector3D(1, 1, 1), QVector3D(1, 0, 0)},
 
-        {QVector3D(-2, 0 , -2), QVector3D(1, 1, 1), QVector3D(1, 0, 0)},
+        {QVector3D(-2, 2 , -2), QVector3D(1, 1, 1), QVector3D(1, 0, 0)},
         {QVector3D(-2, -1 , 2), QVector3D(1, 1, 1), QVector3D(1, 0, 0)},
         {QVector3D(-2, -1 , -2), QVector3D(1, 1, 1), QVector3D(1, 0, 0)},
-
-        {QVector3D(-2.5, 0 , -2), QVector3D(1, 1, 1), QVector3D(-1, 0, 0)},
-        {QVector3D(-2.5, -1 , -2), QVector3D(1, 1, 1), QVector3D(-1, 0, 0)},
-        {QVector3D(-2.5, 0 , 2), QVector3D(1, 1, 1), QVector3D(-1, 0, 0)},
-
-        {QVector3D(-2.5, 0 , 2), QVector3D(1, 1, 1), QVector3D(-1, 0, 0)},
-        {QVector3D(-2.5, -1 , -2), QVector3D(1, 1, 1), QVector3D(-1, 0, 0)},
-        {QVector3D(-2.5, -1 , 2), QVector3D(1, 1, 1), QVector3D(-1, 0, 0)},
-
-        {QVector3D(-2.5, 0 , -2), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
-        {QVector3D(-2.5, 0 , 2), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
-        {QVector3D(-2, 0 , -2), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
-
-        {QVector3D(-2, 0 , -2), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
-        {QVector3D(-2.5, 0 , 2), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
-        {QVector3D(-2, 0 , 2), QVector3D(1, 1, 1), QVector3D(0, 1, 0)},
-
-        {QVector3D(-2.5, 0 , 2), QVector3D(1, 1, 1), QVector3D(0, 0, 1)},
-        {QVector3D(-2.5, -1 , 2), QVector3D(1, 1, 1), QVector3D(0, 0, 1)},
-        {QVector3D(-2, 0 , 2), QVector3D(1, 1, 1), QVector3D(0, 0, 1)},
-
-        {QVector3D(-2, 0 , 2), QVector3D(1, 1, 1), QVector3D(0, 0, 1)},
-        {QVector3D(-2.5, -1 , 2), QVector3D(1, 1, 1), QVector3D(0, 0, 1)},
-        {QVector3D(-2, -1 , 2), QVector3D(1, 1, 1), QVector3D(0, 0, 1)},
-
-        {QVector3D(-2, 0 , -2), QVector3D(1, 1, 1), QVector3D(0, 0, -1)},
-        {QVector3D(-2, -1 , -2), QVector3D(1, 1, 1), QVector3D(0, 0, -1)},
-        {QVector3D(-2.5, 0 , -2), QVector3D(1, 1, 1), QVector3D(0, 0, -1)},
-
-        {QVector3D(-2.5, 0 , -2), QVector3D(1, 1, 1), QVector3D(0, 0, -1)},
-        {QVector3D(-2, -1 , -2), QVector3D(1, 1, 1), QVector3D(0, 0, -1)},
-        {QVector3D(-2.5, -1 , -2), QVector3D(1, 1, 1), QVector3D(0, 0, -1)},
     };
-    int floorVertexCount = 36;
+    int floorVertexCount = 12;
 
     QVector<Vertex> vertexs;
     for(int i = 0; i < boxVertexCount; i++) {
-//        boxVertexs[i].color = QVector3D(1, 1, 1);
+        boxVertexs[i].color = QVector3D(1, 1, 1);
         vertexs.append(boxVertexs[i]);
     }
     for(int i = 0; i < floorVertexCount; i++) {

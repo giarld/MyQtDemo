@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2017-05-07T17:23:40
+# Project created by QtCreator 2017-12-05T19:35:32
 #
 #-------------------------------------------------
 
@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = shadowDemo
+TARGET = subProgress
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -23,12 +23,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 
-SOURCES += main.cpp\
-        glwindow.cpp \
-    box.cpp
+SOURCES += \
+        main.cpp \
+        widget.cpp
 
-HEADERS  += glwindow.h \
-    box.h
+HEADERS += \
+        widget.h
 
-RESOURCES += \
-    res.qrc
+DESTDIR = ../bin

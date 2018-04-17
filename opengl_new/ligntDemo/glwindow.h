@@ -20,13 +20,12 @@ public:
     GLWindow(QWidget *parent = 0);
     ~GLWindow();
 
+    // QOpenGLWidget interface
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
     void resizeGL(int w, int h) Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
-
-    void timerEvent(QTimerEvent *event);
 
 private:
     void initShaderProgram();
@@ -39,27 +38,14 @@ private:
     QOpenGLShaderProgram *mRenderShader;
     Box *mBox;
 
-    float mRotAngle;
-
-    GLuint depTextureId;
-    GLuint depFbo;
-
-    GLuint mAVertex;
-    GLuint mAColor;
-    GLuint mANormal;
-    GLuint mUModelMatrix;
-    GLuint mUViewMatrix;
-    GLuint mUProjMatrix;
-    GLuint mUBiasMatrix;
-    GLuint mUShadowMatrix;
-    GLuint mUNormalMatrix;
-    GLuint mULightDirection;
-    GLuint mUShadowTexture;
-
-    GLuint mADepPos;
-    GLuint mUDepModelMatrix;
-    GLuint mUDepViewMatrix;
-    GLuint mUDepProjMatrix;
+    GLuint mPosAttr;
+    GLuint mColAttr;
+    GLuint mNormalAttr;
+    GLuint mMatrixLoc;
+    GLuint mProjLoc;
+    GLuint mNormalLoc;
+    GLuint mAmbientLoc;
+    GLuint mLightPosLoc;
 };
 
 #endif // GLWINDOW_H
