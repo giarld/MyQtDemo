@@ -1,0 +1,12 @@
+#ifndef FILESERVER_GLOBAL_H
+#define FILESERVER_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(FILESERVER_LIBRARY)
+#  define FILESERVERSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define FILESERVERSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // FILESERVER_GLOBAL_H
