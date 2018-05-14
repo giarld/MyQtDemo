@@ -23,6 +23,9 @@ signals:
 public slots:
 
 private:
+    void requestFile(const QString &fileName, qint64 begin);
+
+private:
     Ui::ClientWidget *ui;
     QTcpSocket *mSocket;
 };

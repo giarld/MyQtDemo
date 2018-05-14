@@ -2,14 +2,15 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QByteArray>
-#include <QDataStream>
 #include <QBuffer>
 #include <glog.h>
 #include <QFile>
+#include <QDir>
+#include <QFileInfo>
 
 uchar FileServer::MSG_HEAD = 0x02;
 uchar FileServer::MSG_END = 0x03;
-qint64 FileServer::BlockSize = 1024;
+qint64 FileServer::BlockSize = 2048;
 
 FileServer::FileServer(QObject *parent)
     : QObject(parent)
@@ -53,6 +54,11 @@ void FileServer::stop()
         it.value().client->deleteLater();
     }
     mClients.clear();
+}
+
+void FileServer::setSearchPath(const QString &path)
+{
+    mSearchPath = path;
 }
 
 FileServer::ClientNode FileServer::getClientNode(const QString &id)
@@ -131,56 +137,32 @@ void FileServer::readMessage()
     buffer.open(QIODevice::ReadOnly);
     QDataStream in(&buffer);
 
-    uchar head = 0;
+    uchar head;
     in >> head;
     if (head == MSG_HEAD) {
-        uint key = 0;
-        in >> key;
-        if (key == uint(MSG_OTHER)) {
+        uint code;
+        uint key;
+        in >> code >> key;
+        if (code == SUCCESS) {
+            if (key == uint(MSG_OTHER)) {
 
-        }
-        else if (key == uint(MSG_STR)) {
-            QByteArray msgData;
-            in >> msgData;
-            emit receiveMessage(client->objectName(), QString(msgData));
-        }
-        else if (key == uint(MSG_FILE_READY)) {
-            uint ok = 0;
-            in >> ok;
-            if (ok) {
-                emit putMessage(QString("%1 准备好接收文件").arg(client->objectName()));
-                sendFileHead(client->objectName());
             }
-            else {
-                emit putMessage(QString("%1 拒绝的文件发送请求").arg(client->objectName()));
+            else if (key == uint(MSG_STR)) {
+                QByteArray msgData;
+                in >> msgData;
+                emit receiveMessage(client->objectName(), QString(msgData));
+            }
+            else if (key == uint(MSG_GET_FILE_LIST)) {
+                sendFileList(client->objectName());
+            }
+            else if (key == uint(MSG_GET_FILE_BLOCK)) {
+                DataBlockRsp rsp;
+                in >> rsp;
+                sendFileBlock(client->objectName(), rsp);
             }
         }
-        else if (key == uint(MSG_FILE_HEAD)) {
-            uint keep = 0;
-            in >> keep;
-            if (keep) {
-                sendFileNextBlock(client->objectName());
-            } else {
-                endSendFile(client->objectName());
-            }
-        }
-        else if (key == uint(MSG_FILE_BODY)) {
-            uint keep = 0;
-            in >> keep;
-            if (keep) {
-                sendFileNextBlock(client->objectName());
-            } else {
-                endSendFile(client->objectName());
-            }
-        }
-        else if (key == uint(MSG_FILE_END)) {
-            endSendFile(client->objectName());
-        }
-        else if (key == uint(MSG_FILE_ERROR)) {
-
-        }
-        else if (key == uint(MSG_FILE_RETRY)) {
-
+        else {
+            handleError(code);
         }
     }
 
@@ -193,7 +175,7 @@ void FileServer::sendMessage(QTcpSocket *client, FileServer::MSG_KEY key, const 
     QBuffer buffer(&msgData);
     buffer.open(QIODevice::WriteOnly);
     QDataStream out(&buffer);
-    out << MSG_HEAD << (uint) key << data << MSG_END;
+    out << MSG_HEAD << (int)SUCCESS << (uint) key << data << MSG_END;
     buffer.close();
     client->write(msgData);
 }
@@ -215,118 +197,159 @@ void FileServer::sendStringMsgToAll(const QString &msg)
     }
 }
 
-void FileServer::sendFile(const QString &clientId, const QString &filePath)
+void FileServer::sendError(QTcpSocket *client, FileServer::MSG_KEY key, FileServer::ERROR_CODE error)
 {
-    if (filePath == "")
-        return;
+    QByteArray msgData;
+    QBuffer buffer(&msgData);
+    buffer.open(QIODevice::WriteOnly);
+    QDataStream out(&buffer);
+    out << MSG_HEAD << (uint)key << (uint)error << MSG_END;
+    buffer.close();
+    client->write(msgData);
+}
+
+void FileServer::sendFileList(const QString &clientId)
+{
     ClientNode node = getClientNode(clientId);
-    if (node.client) {
-        node.inSendFile = true;
-        node.filePath = filePath;
-        node.position = 0;
-        node.lastPosition = 0;
-        QFile file(node.filePath);
-        if (file.exists()) {
-            QString fileName = file.fileName();
+    if (!node.client) {
+        return;
+    }
+    QDir dir(mSearchPath);
+
+    if (!dir.exists()) {
+        gLogError("sendFileList dir not exists");
+        sendError(node.client, MSG_GET_FILE_LIST, ERROR_DIR_NEXISTS);
+        return;
+    }
+    dir.setFilter(QDir::Files | QDir::NoSymLinks);
+    dir.setSorting(QDir::Size | QDir::Reversed);
+    QFileInfoList files = dir.entryInfoList();
+    QString msgs;
+    foreach (QFileInfo info, files) {
+        msgs.append(info.fileName());
+        msgs.append(",");
+    }
+    if (msgs.endsWith(",")) {
+        msgs = msgs.mid(0, msgs.length() - 1);
+    }
+    QByteArray data;
+    data.append(msgs.toUtf8());
+    sendMessage(node.client, MSG_GET_FILE_LIST, data);
+    emit putMessage("sendFileList success");
+}
+
+void FileServer::sendFileBlock(const QString &clientId, const DataBlockRsp &rsp)
+{
+    ClientNode node = getClientNode(clientId);
+    if (!node.client) {
+        return;
+    }
+    if (mSearchPath == "") {
+        sendError(node.client, MSG_GET_FILE_LIST, ERROR_DIR_NEXISTS);
+        return;
+    }
+    if (rsp.fileName == "") {
+        sendError(node.client, MSG_GET_FILE_BLOCK, ERROR_FILE_NEXISTS);
+        return;
+    }
+    QString path = getFilePath(rsp.fileName);
+    if (path == "") {
+        sendError(node.client, MSG_GET_FILE_BLOCK, ERROR_FILE_NEXISTS);
+        return;
+    }
+    QFile file(path);
+    if (!file.exists()) {
+        sendError(node.client, MSG_GET_FILE_BLOCK, ERROR_FILE_NEXISTS);
+        return;
+    }
+    if (file.open(QIODevice::ReadOnly)) {
+        file.seek(rsp.begin);
+        char *data = new char[BlockSize + 1];
+        qint64 size = file.read(data, BlockSize);
+        if (size < 0) {
+            delete[] data;
             QByteArray msg;
             QBuffer buffer(&msg);
             buffer.open(QIODevice::WriteOnly);
             QDataStream out(&buffer);
-            out << fileName.toUtf8();
+            QByteArray fnByte;
+            fnByte.append(rsp.fileName);
+            out << fnByte << file.size() << QByteArray();
             buffer.close();
-            sendMessage(node.client, MSG_FILE_READY, msg);
-        }
-    }
-}
-
-void FileServer::sendFileHead(const QString &clientId)
-{
-    ClientNode node = getClientNode(clientId);
-    if (node.client && node.inSendFile) {
-        QFile file(node.filePath);
-        if (!file.exists()) {
-            sendFileError(node.client, FileServer::EROOR_FILE_READ);
-            endSendFile(clientId);
-        }
-        else if (!file.open(QIODevice::ReadOnly)) {
-            sendFileError(node.client, FileServer::EROOR_FILE_READ);
-            endSendFile(clientId);
+            sendMessage(node.client, MSG_GET_FILE_BLOCK, msg);
         }
         else {
-            QByteArray data;
-            QBuffer buffer(&data);
+            QByteArray bytes(data, size);
+            delete[] data;
+            QByteArray msg;
+            QBuffer buffer(&msg);
             buffer.open(QIODevice::WriteOnly);
             QDataStream out(&buffer);
-            out << file.fileName().toUtf8() << file.size();
+            QByteArray fnByte;
+            fnByte.append(rsp.fileName);
+            out << fnByte << rsp.begin + size << bytes;
             buffer.close();
-            sendMessage(node.client, MSG_FILE_HEAD, data);
-            file.close();
+            sendMessage(node.client, MSG_GET_FILE_BLOCK, msg);
         }
+        file.close();
     }
 }
 
-void FileServer::sendFileNextBlock(const QString &clientId)
-{
-    ClientNode node = getClientNode(clientId);
-    if (node.client && node.inSendFile) {
-        QFile file(node.filePath);
-        if (!file.exists()) {
-            sendFileError(node.client, FileServer::EROOR_FILE_READ);
-            endSendFile(clientId);
-        }
-        else if (!file.open(QIODevice::ReadOnly)) {
-            sendFileError(node.client, FileServer::EROOR_FILE_READ);
-            endSendFile(clientId);
-        }
-        else {
-            if(node.position >= file.size()) {
-                QByteArray data;
-                data.append(1);
-                sendMessage(node.client, MSG_FILE_END, data);
-            } else {
-                file.seek(node.position);
-                char *data = new char[BlockSize + 1];
-                qint64 size = file.read(data, BlockSize);
-                if (size < 0) {
-                    delete[] data;
-                    QByteArray msg;
-                    msg.append(1);
-                    sendMessage(node.client, MSG_FILE_END, msg);
-                } else {
-                    node.lastPosition = node.position;
-                    node.position += size;
-                    QByteArray bytes(data, size);
-                    delete[] data;
-                    QByteArray msg;
-                    QBuffer buffer(&msg);
-                    buffer.open(QIODevice::WriteOnly);
-                    QDataStream out(&buffer);
-                    out << node.lastPosition << bytes;
-                    buffer.close();
-                    sendMessage(node.client, MSG_FILE_BODY, msg);
-                }
-            }
-            file.close();
-        }
-    }
-}
-
-void FileServer::endSendFile(const QString &clientId)
-{
-    ClientNode node = getClientNode(clientId);
-    if (node.client) {
-        node.inSendFile = false;
-        node.filePath = "";
-        node.position = node.lastPosition = 0;
-    }
-}
-
-void FileServer::sendFileError(QTcpSocket *client, FileServer::FILE_ERROR_CODE code)
-{
-
-}
+//void FileServer::sendFile(const QString &clientId, const QString &filePath)
+//{
+//    if (filePath == "")
+//        return;
+//    ClientNode node = getClientNode(clientId);
+//    if (node.client) {
+//        node.inSendFile = true;
+//        node.filePath = filePath;
+//        node.position = 0;
+//        node.lastPosition = 0;
+//        QFile file(node.filePath);
+//        if (file.exists()) {
+//            QString fileName = file.fileName();
+//            QByteArray msg;
+//            QBuffer buffer(&msg);
+//            buffer.open(QIODevice::WriteOnly);
+//            QDataStream out(&buffer);
+//            out << fileName.toUtf8();
+//            buffer.close();
+//            sendMessage(node.client, MSG_FILE_READY, msg);
+//        }
+//    }
+//}
 
 QString FileServer::genKey()
 {
     return QString("client_%1").arg(mKeyIndex++);
+}
+
+QString FileServer::getFilePath(const QString &fileName)
+{
+    QDir dir(mSearchPath);
+    if (!dir.exists()) {
+        return "";
+    }
+    return dir.absoluteFilePath(fileName);
+}
+
+void FileServer::handleError(uint error)
+{
+
+}
+
+QDataStream &operator <<(QDataStream &out, const DataBlockRsp &data)
+{
+    QByteArray fnByte;
+    fnByte.append(data.fileName.toUtf8());
+    out << fnByte << data.begin;
+    return out;
+}
+
+QDataStream &operator >>(QDataStream &in, DataBlockRsp &data)
+{
+    QByteArray fnByte;
+    in >> fnByte >> data.begin;
+    data.fileName = QString(fnByte);
+    return in;
 }

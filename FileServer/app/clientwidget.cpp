@@ -4,6 +4,7 @@
 #include <QHostAddress>
 #include <QByteArray>
 #include <QBuffer>
+#include <QFile>
 #include <QDataStream>
 #include <fileserver.h>
 
@@ -31,42 +32,77 @@ ClientWidget::ClientWidget(QWidget *parent)
         mSocket->connectToHost(QHostAddress::LocalHost, 8081);
     });
     connect(ui->sendButton, &QPushButton::clicked, [this]() {
-        QString text = ui->msgEdit->text();
-        QByteArray data;
-        QBuffer buffer(&data);
-        buffer.open(QIODevice::WriteOnly);
-        QDataStream out(&buffer);
-        out << FileServer::MSG_HEAD << FileServer::MSG_STR << text.toUtf8() << FileServer::MSG_END;
-        buffer.close();
-        mSocket->write(data);
+//        QString text = ui->msgEdit->text();
+//        QByteArray data;
+//        QBuffer buffer(&data);
+//        buffer.open(QIODevice::WriteOnly);
+//        QDataStream out(&buffer);
+//        out << FileServer::MSG_HEAD << (uint)FileServer::SUCCESS << (uint)FileServer::MSG_STR << text.toUtf8() << FileServer::MSG_END;
+//        buffer.close();
+//        mSocket->write(data);
+
+//        QByteArray data;
+//        QBuffer buffer(&data);
+//        buffer.open(QIODevice::WriteOnly);
+//        QDataStream out(&buffer);
+//        out << FileServer::MSG_HEAD << (uint)FileServer::SUCCESS << (uint)FileServer::MSG_GET_FILE_LIST << FileServer::MSG_END;
+//        buffer.close();
+//        mSocket->write(data);
+
+          requestFile("big.apk", 0);
     });
 
     connect(mSocket, &QTcpSocket::readyRead, [this]() {
         QByteArray data = mSocket->readAll();
+        if (data.isEmpty()) {
+            gLogError("readMessage data is Null");
+            return;
+        }
+
+        if (data.at(0) != FileServer::MSG_HEAD || data.at(data.length() - 1) != FileServer::MSG_END) {
+            gLogError("readMessage data error");
+            return;
+        }
         QBuffer buffer(&data);
         buffer.open(QIODevice::ReadOnly);
         QDataStream in(&buffer);
 
-        uchar head = 0;
+        uchar head;
         in >> head;
         if (head == FileServer::MSG_HEAD) {
-            uint key = 0;
-            in >> key;
+            uint code;
+            uint key;
+            in >> code >> key;
             if (key == uint(FileServer::MSG_STR)) {
                 QByteArray sd;
                 in >> sd;
                 ui->msgText->appendPlainText("Server: " + QString(sd));
             }
-            else if (key == uint(FileServer::MSG_FILE_READY)) {
+            else if (key == uint(FileServer::MSG_GET_FILE_LIST)) {
                 QByteArray msg;
                 in >> msg;
-                QBuffer msgBuffer(&msg);
-                msgBuffer.open(QIODevice::ReadOnly);
-                QDataStream in(&msgBuffer);
-                QByteArray fileNameByte;
-                in >> fileNameByte;
-                buffer.close();
-                ui->msgText->appendPlainText("Server: Ready send file = " + QString(fileNameByte));
+                ui->msgText->appendPlainText("Server: Ready send file = " + QString(msg));
+            }
+            else if (key == uint(FileServer::MSG_GET_FILE_BLOCK)) {
+                QByteArray msg;
+                in >> msg;
+                QBuffer fbuffer(&msg);
+                fbuffer.open(QIODevice::ReadOnly);
+                QDataStream inf(&fbuffer);
+                QByteArray fnByte;
+                qint64 pos;
+                QByteArray fdata;
+                inf >> fnByte >> pos >> fdata;
+                fbuffer.close();
+                QString fileName = QString(fnByte);
+                QFile file(fileName);
+                if (file.open(QIODevice::Append)) {
+                    file.write(fdata);
+                    file.close();
+                    ui->msgText->appendPlainText("Server: download file = " + fileName + " pos = " + QString::number(pos));
+                }
+                if (fdata.size() == 2048)
+                    requestFile(fileName, pos);
             }
         }
 
@@ -83,3 +119,19 @@ void ClientWidget::closeEvent(QCloseEvent *event)
 {
     mSocket->close();
 }
+
+void ClientWidget::requestFile(const QString &fileName, qint64 begin)
+{
+    QByteArray data;
+    QBuffer buffer(&data);
+    buffer.open(QIODevice::WriteOnly);
+    QDataStream out(&buffer);
+    DataBlockRsp rsp;
+    rsp.fileName = fileName;
+    rsp.begin = begin;
+    out << FileServer::MSG_HEAD << (uint)FileServer::SUCCESS << (uint)FileServer::MSG_GET_FILE_BLOCK << rsp << FileServer::MSG_END;
+    buffer.close();
+    mSocket->write(data);
+}
+
+

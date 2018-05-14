@@ -18,11 +18,12 @@ GLWindow::~GLWindow()
 void GLWindow::initializeGL()
 {
     initializeOpenGLFunctions();
+    QOpenGLFunctions_3_3_Core *gl33 = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_3_Core>();
+    gl33->initializeOpenGLFunctions();
     QString glVstr=tr("(OpenGL Version : %1.%2)").arg(this->format().version().first).arg(this->format().version().second);
     this->setWindowTitle(glVstr);
 
-    QOpenGLFunctions *gl = QOpenGLContext::currentContext()->functions();
-    gl->glClearColor(0, 0, 0, 1.0f);
+    gl33->glClearColor(0, 0, 0, 1.0f);
 
     mVAO.create();
     mVAO.bind();
@@ -31,24 +32,24 @@ void GLWindow::initializeGL()
     initShaderProgram();
 
     depTextureId = 0;
-    gl->glGenTextures(1, &depTextureId);
-    gl->glBindTexture(GL_TEXTURE_2D, depTextureId);
-    gl->glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1280, 720, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    gl33->glGenTextures(1, &depTextureId);
+    gl33->glBindTexture(GL_TEXTURE_2D, depTextureId);
+    gl33->glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1280, 720, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+    gl33->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    gl33->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
+    gl33->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    gl33->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
 
-    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    gl->glBindTexture(GL_TEXTURE_2D, 0);
+    gl33->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    gl33->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    gl33->glBindTexture(GL_TEXTURE_2D, 0);
 
     depFbo = 0;
-    gl->glGenFramebuffers(1, &depFbo);
-    gl->glBindFramebuffer(GL_FRAMEBUFFER, depFbo);
-    glDrawBuffer(GL_NONE);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depTextureId, 0);
+    gl33->glGenFramebuffers(1, &depFbo);
+    gl33->glBindFramebuffer(GL_FRAMEBUFFER, depFbo);
+    gl33->glDrawBuffer(GL_NONE);
+    gl33->glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depTextureId, 0);
 }
 
 void GLWindow::resizeGL(int w, int h)

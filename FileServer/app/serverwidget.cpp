@@ -15,6 +15,7 @@ ServerWidget::ServerWidget(QWidget *parent) :
     mFileServer = new FileServer(this);
 
     mFileServer->start(8081);
+    mFileServer->setSearchPath("./test/");
 
     this->setWindowTitle(tr("服务端"));
 
@@ -40,9 +41,7 @@ ServerWidget::ServerWidget(QWidget *parent) :
 
 
     connect(ui->sendButton, &QPushButton::clicked, [this]() {
-//        QString text = ui->msgEdit->text();
-//        mFileServer->sendStringMsgToAll(text);
-        mFileServer->sendFile("client_1", "/home/gxin/下载/qt-opensource-linux-x64-5.10.0.run");
+        mFileServer->sendStringMsgToAll(ui->msgEdit->text());
     });
 }
 
