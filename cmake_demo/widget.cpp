@@ -4,6 +4,8 @@
 
 #include "widget.h"
 #include "ui_widget.h"
+#include <QImage>
+#include <QPainter>
 
 Widget::Widget(QWidget *parent)
         : QWidget(parent),
@@ -16,4 +18,12 @@ Widget::Widget(QWidget *parent)
 Widget::~Widget()
 {
     delete ui;
+}
+
+void Widget::paintEvent(QPaintEvent *event)
+{
+    QWidget::paintEvent(event);
+    QPainter painter(this);
+    QImage image(":/pic.png");
+    painter.drawImage(QRect(0, 0, this->width(), this->height()), image);
 }

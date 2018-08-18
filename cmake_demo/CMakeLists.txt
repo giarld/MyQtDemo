@@ -19,6 +19,11 @@ qt5_wrap_ui(
         ui/widget.ui
 )
 
+qt5_add_resources(
+        QRC_FILE
+        res/resources.qrc
+)
+
 set(SRCS
         main.cpp widget.cpp widget.h
 )
@@ -26,6 +31,7 @@ set(SRCS
 add_executable(cmake_demo
         ${SRCS}
         ${UI_FILE}
+        ${QRC_FILE}
         )
 
 target_link_libraries(cmake_demo
